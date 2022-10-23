@@ -33,7 +33,7 @@ You can download the binaries at our [releases](https://github.com/isadorasophia
 **ps1**
 ```shell
 mkdir bin
-Invoke-WebRequest release-link-windows -OutFile bin/parser.zip
+Invoke-WebRequest https://github.com/isadorasophia/dotnet2md/releases/download/v0.1/dotnet2md-v0.1-win-x64.zip -OutFile bin/parser.zip
 Expand-Archive bin/parser.zip -DestinationPath bin
 Remove-Item bin/parser.zip
 ```
@@ -41,6 +41,6 @@ Remove-Item bin/parser.zip
 **sh**
 ```bash
 mkdir bin
-curl -sSL release-link-linux | tar -xz --directory=bin
+curl -sSL https://github.com/isadorasophia/dotnet2md/releases/download/v0.1/dotnet2md-v0.1-linux-x64.tar.gz | tar -xz --directory=bin
 bin/mdbook build
 ```
