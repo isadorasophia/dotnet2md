@@ -137,7 +137,7 @@ namespace DotnetToMd
             {
                 builder.Append("### ⭐ Constructors\n");
 
-                List<MethodInformation> sortedConstructors = t.Constructors.Values.OrderBy(s => s.Signature).ToList();
+                List<MethodInformation> sortedConstructors = t.Constructors.Values.OrderBy(s => s.FullSignature).ToList();
                 foreach (MethodInformation c in sortedConstructors)
                 {
                     builder.Append(MethodToMarkdown(c));
@@ -171,7 +171,7 @@ namespace DotnetToMd
                 builder.Append("### ⭐ Methods\n");
 
                 // TODO: This will not sort methods with types from different namespaces.
-                List<MethodInformation> sortedMethods = t.Methods.Values.OrderBy(s => s.Signature).ToList();
+                List<MethodInformation> sortedMethods = t.Methods.Values.OrderBy(s => s.FullSignature).ToList();
                 foreach (MethodInformation m in sortedMethods)
                 {
                     builder.Append($"#### {m.GetPrettyKey()}\n");

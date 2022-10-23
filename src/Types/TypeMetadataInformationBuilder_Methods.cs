@@ -109,6 +109,7 @@ namespace DotnetToMd.Metadata
                 methodInfo.GenericArguments = genericParameters.ToImmutableArray();
 
                 methodInfo.Signature = CreateMethodSignature(method, returnInfo?.Type);
+                methodInfo.FullSignature = CreateMethodSignature(method, returnInfo?.Type, fullTypeNames: true);
             }
 
             var builder = ImmutableDictionary.CreateBuilder<string, MethodInformation>();
@@ -127,7 +128,7 @@ namespace DotnetToMd.Metadata
             return !m.IsPrivate && !m.IsAssembly;
         }
 
-        private string? CreateMethodSignature(MethodBase m, TypeInformation? returnTypeInfo)
+        private string? CreateMethodSignature(MethodBase m, TypeInformation? returnTypeInfo, bool fullTypeNames = false)
         {
             StringBuilder result = new();
 
@@ -168,6 +169,11 @@ namespace DotnetToMd.Metadata
                 if (i != 0)
                 {
                     result.Append(", ");
+                }
+
+                if (fullTypeNames && !string.IsNullOrEmpty(typeInfo.Namespace))
+                {
+                    result.Append($"{typeInfo.Namespace}.");
                 }
 
                 result.Append($"{typeInfo.Name} {parameters[i].Name}");

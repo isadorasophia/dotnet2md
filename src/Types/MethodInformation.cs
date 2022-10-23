@@ -107,6 +107,11 @@ namespace DotnetToMd.Metadata
         public string? Summary;
         public string? Signature;
 
+        /// <summary>
+        /// This is used when comparing different methods with different generic arguments.
+        /// </summary>
+        public string? FullSignature;
+
         public MethodInformation(string name, TypeInformation declaringType, ArgumentInformation? @return)
         {
             Name = name;
