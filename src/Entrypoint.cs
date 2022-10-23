@@ -35,15 +35,24 @@ namespace DotnetToMd
             string outputPath = ProcessPathToRoot(args[1]);
 
             // Name of the target assembly which we will scan.
-            string[] targetAssemblies = new string[args.Length - 2];
+            List<string> targetAssemblies = new();
             for (int i = 2; i < args.Length; i++)
             {
-                targetAssemblies[i - 2] = args[i];
+                targetAssemblies.AddRange(args[i].Split(' '));
             }
 
             try
             {
                 Parse(sourcePath, outputPath, targetAssemblies);
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ResetColor();
+
+                Console.WriteLine($"Make sure your project has all the dependencies reachable from '{sourcePath}'.");
+                return;
             }
             catch (Exception e)
             {
@@ -61,7 +70,7 @@ namespace DotnetToMd
         /// <summary>
         /// Public entrypoint if called as a library.
         /// </summary>
-        public static void Parse(string sourcePath, string outputPath, params string[] targetAssemblies)
+        public static void Parse(string sourcePath, string outputPath, IEnumerable<string> targetAssemblies)
         {
             CreateIfNotFound(outputPath);
 
