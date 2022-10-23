@@ -1,9 +1,7 @@
 ﻿using DotnetToMd.Metadata;
 using System.Collections.Immutable;
-using System.Data.Common;
 using System.Diagnostics;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Xml.Linq;
 
 namespace DotnetToMd
@@ -16,16 +14,16 @@ namespace DotnetToMd
 
         private readonly ImmutableArray<Assembly> _dependencies;
 
-        private readonly string _xmlFile;
+        private readonly ImmutableArray<string> _xmlFiles;
         private readonly string _outputPath;
 
-        internal Parser(List<Assembly> target, List<Assembly> dependencies, string xmlFile, string outputPath)
+        internal Parser(List<Assembly> target, List<Assembly> dependencies, string[] xmlFiles, string outputPath)
         {
             Targets = target.ToImmutableHashSet();
 
             _dependencies = dependencies.ToImmutableArray();
 
-            _xmlFile = xmlFile;
+            _xmlFiles = xmlFiles.ToImmutableArray();
             _outputPath = outputPath;
         }
 
@@ -54,20 +52,21 @@ namespace DotnetToMd
 
         private void ReadXml()
         {
-            XDocument xml = XDocument.Load(_xmlFile);
-
-            if (xml.Root?.Descendants("members")?.Elements() is not IEnumerable<XElement> members)
+            foreach (string file in _xmlFiles)
             {
-                // No members declared?
-                return;
-            }
+                XDocument xml = XDocument.Load(file);
 
-            foreach (XElement element in members)
-            {
-                ProcessMember(element);
-            }
+                if (xml.Root?.Descendants("members")?.Elements() is not IEnumerable<XElement> members)
+                {
+                    // No members declared?
+                    return;
+                }
 
-            return;
+                foreach (XElement element in members)
+                {
+                    ProcessMember(element);
+                }
+            }
         }
 
         private void ProcessMember(XElement element)

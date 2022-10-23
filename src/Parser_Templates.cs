@@ -1,13 +1,12 @@
 ﻿using DotnetToMd.Metadata;
 using System.Collections.Immutable;
 using System.Text;
-using System.Xml.Linq;
 
 namespace DotnetToMd
 {
     internal partial class Parser
     {
-        private readonly Dictionary<string /* path */, string /* name */> _markdowns = new();
+        private readonly Dictionary<string /* path */, string /* name */> _markdowns = new(StringComparer.OrdinalIgnoreCase);
 
         private void GenerateMarkdown()
         {
@@ -26,7 +25,7 @@ namespace DotnetToMd
                 string namespacePath = Path.Join(_outputPath, CreatePathForNamespace(t.Namespace));
                 if (!Directory.Exists(namespacePath))
                 {
-                    Directory.CreateDirectory(namespacePath);
+                    _ = Directory.CreateDirectory(namespacePath);
                 }
                 
                 string fullPath = Path.Join(namespacePath, $"{t.EscapedFilename}.md");
@@ -35,7 +34,7 @@ namespace DotnetToMd
                 _markdowns.Add(fullPath, t.EscapedNameForHeader);
             }
 
-            HashSet<string> targetNamespaces = Targets.Select(a => Path.GetFileNameWithoutExtension(a.ManifestModule.Name)).ToHashSet();
+            HashSet<string> targetNamespaces = Targets.Select(a => Path.GetFileNameWithoutExtension(a.ManifestModule.Name)).ToHashSet(StringComparer.OrdinalIgnoreCase);
             Dictionary<string, string> summaryResultPerTarget = new();
 
             foreach (string directory in Directory.GetDirectories(_outputPath))
@@ -58,7 +57,7 @@ namespace DotnetToMd
                 string summaryFileContent = File.ReadAllText(presummaryFilePath);
                 foreach (string target in summaryResultPerTarget.Keys)
                 {
-                    summaryFileContent = summaryFileContent.Replace($"<{target}-Content>", $"{summaryResultPerTarget[target]}");
+                    summaryFileContent = summaryFileContent.Replace($"<{target}-Content>", $"{summaryResultPerTarget[target]}", StringComparison.InvariantCultureIgnoreCase);
                 }
 
                 File.WriteAllText(summaryFilePath, summaryFileContent);

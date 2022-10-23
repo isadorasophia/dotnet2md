@@ -39,6 +39,10 @@ namespace DotnetToMd.Metadata
 
                 typeInformation = new TypeByReferenceInformation(underlyingType, t);
             }
+            else if (t.IsGenericType && !t.IsGenericTypeDefinition)
+            {
+                typeInformation = FetchOrCreate(parser, t.GetGenericTypeDefinition())!;
+            }
             else if (t.IsGenericParameter)
             {
                 typeInformation = CreateGenericParameterTypeInformation(parser, t);

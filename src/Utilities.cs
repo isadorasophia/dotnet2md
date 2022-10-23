@@ -22,7 +22,15 @@ namespace DotnetToMd
             string name = useFullName && genericType.FullName is not null ? 
                 genericType.FullName : genericType.Name;
 
-            return name.Substring(0, name.IndexOf("`", StringComparison.InvariantCulture));
+            // In some cases, the generic name is actually the parent type.
+            // So we will check if there is any generic that requires clean up.
+            int index = name.IndexOf("`", StringComparison.InvariantCulture);
+            if (index != -1)
+            {
+                return name.Substring(0, name.IndexOf("`", StringComparison.InvariantCulture));
+            }
+
+            return name;
         }
 
         public static string GetDeclaringTypeName(string name) =>

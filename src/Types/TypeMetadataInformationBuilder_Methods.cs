@@ -41,7 +41,8 @@ namespace DotnetToMd.Metadata
 
                 if (method.DeclaringType == typeof(object) || 
                     method.DeclaringType == typeof(ValueType) ||
-                    method.DeclaringType == typeof(Enum))
+                    method.DeclaringType == typeof(Enum) ||
+                    method.DeclaringType == typeof(Attribute))
                 {
                     // Skip default methods.
                     continue;
@@ -110,7 +111,15 @@ namespace DotnetToMd.Metadata
                 methodInfo.Signature = CreateMethodSignature(method, returnInfo?.Type);
             }
 
-            return result.ToDictionary(m => m.GetKey(), m => m).ToImmutableDictionary();
+            var builder = ImmutableDictionary.CreateBuilder<string, MethodInformation>();
+            foreach (MethodInformation m in result)
+            {
+                // We might expect methods with the same signature due to overriding settings.
+                // In these cases, just keep track of one of them.
+                builder[m.GetKey()] = m;
+            }
+
+            return builder.ToImmutable();
         }
 
         private static bool IsMethodVisible(MethodBase m)
@@ -133,6 +142,15 @@ namespace DotnetToMd.Metadata
             }
             else
             {
+                if (m.IsAbstract)
+                {
+                    result.Append("abstract ");
+                }
+                else if (m.IsVirtual)
+                {
+                    result.Append("virtual ");
+                }
+
                 result.Append($"{returnTypeInfo?.Name ?? "void"} ");
                 result.Append($"{m.Name}(");
             }

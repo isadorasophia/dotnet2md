@@ -32,7 +32,16 @@ namespace DotnetToMd.Metadata
                 propertyInfo.Signature = CreatePropertySignature(property, propertyType);
             }
 
-            return result.ToDictionary(p => p.Name, p => p).ToImmutableDictionary();
+
+            var builder = ImmutableDictionary.CreateBuilder<string, PropertyInformation>();
+            foreach (PropertyInformation p in result)
+            {
+                // We might expect properties with the same signature due to overriding settings.
+                // In these cases, just keep track of one of them.
+                builder[p.Name] = p;
+            }
+
+            return builder.ToImmutable();
         }
 
         private static bool IsPropertyVisible(PropertyInfo p)
@@ -63,6 +72,11 @@ namespace DotnetToMd.Metadata
             if (getMethod.IsAbstract)
             {
                 result.Append("abstract ");
+            }
+
+            if (getMethod.IsVirtual)
+            {
+                result.Append("virtual ");
             }
 
             if (getMethod.IsStatic)

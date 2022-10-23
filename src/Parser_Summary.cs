@@ -106,6 +106,15 @@ namespace DotnetToMd
                     referenceLink = GetMethodReferenceLink(type, methodName);
                     break;
 
+                case '!':
+                    // So far, I have only seen that happen for generic parameters. Not really supported as of now.
+                    break;
+
+                case 'A':
+                case 'N':
+                    // TODO: Assembly reference?
+                    break;
+
                 default:
                     Debug.Fail("Unsupported scenario?");
                     break;

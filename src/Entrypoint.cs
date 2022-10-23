@@ -65,8 +65,8 @@ namespace DotnetToMd
         {
             CreateIfNotFound(outputPath);
 
-            string? xmlFile = GetXmlFilePath(sourcePath);
-            if (xmlFile is null)
+            string[] xmlFiles = GetXmlFilePaths(sourcePath).ToArray();
+            if (xmlFiles.Count() == 0)
             {
                 throw new ArgumentException("No .xml path was found. Please revisit the output path.");
             }
@@ -106,7 +106,7 @@ namespace DotnetToMd
                 throw new InvalidOperationException($"Unable to find any of the target assemblies. Did you pass the correct name?");
             }
 
-            Parser parser = new(assembliesToScan, dependencies, xmlFile, outputPath);
+            Parser parser = new(assembliesToScan, dependencies, xmlFiles, outputPath);
             parser.Generate();
         }
 
@@ -118,13 +118,12 @@ namespace DotnetToMd
             Directory.EnumerateFiles(path, "*.dll", SearchOption.AllDirectories);
 
         /// <summary>
-        /// Look recursively for all the files in <paramref name="path"/> for the .xml file.
+        /// Look recursively for all the files in <paramref name="path"/> with a .xml file.
         /// </summary>
         /// <param name="path">Rooted path to the binaries folder. This must be a valid directory.</param>
-        private static string? GetXmlFilePath(in string path)
+        private static IEnumerable<string> GetXmlFilePaths(in string path)
         {
-            return Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories)
-                .FirstOrDefault();
+            return Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories);
         }
 
         /// <summary>
