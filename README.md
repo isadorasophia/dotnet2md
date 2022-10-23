@@ -36,7 +36,7 @@ _From Visual Studio_
 2. Build!
 
 ### Pre-compiled binaries
-You can download the binaries at our [releases](https://github.com/isadorasophia/dotnet2md/release) page. Or through the command line:
+You can download the binaries at our [releases](https://github.com/isadorasophia/dotnet2md/releases/) page. Or with the command line:
 
 **ps1**
 ```shell
