@@ -34,7 +34,7 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0)
 
-          release_name="dotnet2md-$tag-${{ matrix.target }}"
+          release_name="dotnet2md-parser-$tag-${{ matrix.target }}"
 
           # Build everything
           dotnet publish --runtime "${{ matrix.target }}" -c Release -o "$release_name"
@@ -53,6 +53,6 @@ jobs:
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
-          files: "dotnet2md*"
+          files: "dotnet2md-parser*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
