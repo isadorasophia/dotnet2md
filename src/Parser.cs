@@ -163,7 +163,7 @@ namespace DotnetToMd
                         string parameterSummary = parameter.Value.Trim();
 
                         if (parameterName is not null && 
-                            methodInfo.Parameters.TryGetValue(parameterName, out ArgumentInformation? argument))
+                            methodInfo.Parameters.Value.FirstOrDefault(p => p.Name == parameterName) is ArgumentInformation argument)
                         {
                             argument.Summary = FormatSummary(parameterSummary);
                         }

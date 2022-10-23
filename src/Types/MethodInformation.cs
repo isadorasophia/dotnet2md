@@ -10,7 +10,11 @@ namespace DotnetToMd.Metadata
         public readonly ArgumentInformation? Return;
 
         public ImmutableArray<ArgumentInformation>? GenericArguments;
-        public ImmutableDictionary<string, ArgumentInformation>? Parameters;
+
+        /// <summary>
+        /// This is not a dictionary since it's important to keep the order for this.
+        /// </summary>
+        public ImmutableArray<ArgumentInformation>? Parameters;
 
         public ImmutableArray<(TypeInformation Type, string Summary)>? Exceptions;
 
@@ -37,12 +41,12 @@ namespace DotnetToMd.Metadata
                     result.Append($"``{GenericArguments?.Length}");
                 }
 
-                if (Parameters?.Count > 0)
+                if (Parameters?.Length > 0)
                 {
                     result.Append("(");
 
-                    int remainingParameters = Parameters.Count;
-                    foreach (ArgumentInformation arg in Parameters.Values)
+                    int remainingParameters = Parameters.Value.Length;
+                    foreach (ArgumentInformation arg in Parameters.Value)
                     {
                         remainingParameters--;
                         result.Append(arg.Type.GetKey());
@@ -76,8 +80,8 @@ namespace DotnetToMd.Metadata
 
             if (Parameters is not null)
             {
-                int remainingParameters = Parameters.Count;
-                foreach (ArgumentInformation arg in Parameters.Values)
+                int remainingParameters = Parameters.Value.Length;
+                foreach (ArgumentInformation arg in Parameters)
                 {
                     remainingParameters--;
 

@@ -105,7 +105,7 @@ namespace DotnetToMd.Metadata
 
                 result.Add(methodInfo);
 
-                methodInfo.Parameters = parameters.ToDictionary(p => p.Name!, p => p).ToImmutableDictionary();
+                methodInfo.Parameters = parameters.ToImmutableArray();
                 methodInfo.GenericArguments = genericParameters.ToImmutableArray();
 
                 methodInfo.Signature = CreateMethodSignature(method, returnInfo?.Type);

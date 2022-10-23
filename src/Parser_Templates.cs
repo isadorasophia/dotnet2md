@@ -137,7 +137,8 @@ namespace DotnetToMd
             {
                 builder.Append("### ⭐ Constructors\n");
 
-                foreach (MethodInformation c in t.Constructors.Values)
+                List<MethodInformation> sortedConstructors = t.Constructors.Values.OrderBy(s => s.Signature).ToList();
+                foreach (MethodInformation c in sortedConstructors)
                 {
                     builder.Append(MethodToMarkdown(c));
                 }
@@ -147,7 +148,7 @@ namespace DotnetToMd
             {
                 builder.Append("### ⭐ Properties\n");
 
-                List<PropertyInformation> sortedProperties = t.Properties.Values.OrderBy(p => p.Name).ToList();
+                List<PropertyInformation> sortedProperties = t.Properties.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToList();
                 foreach (PropertyInformation p in sortedProperties)
                 {
                     builder.Append(PropertyToMarkdown(p));
@@ -158,7 +159,7 @@ namespace DotnetToMd
             {
                 builder.Append("### ⭐ Events\n");
 
-                List<PropertyInformation> sortedEvents = t.Events.Values.OrderBy(e => e.Name).ToList();
+                List<PropertyInformation> sortedEvents = t.Events.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToList();
                 foreach (PropertyInformation p in sortedEvents)
                 {
                     builder.Append(PropertyToMarkdown(p));
@@ -169,7 +170,8 @@ namespace DotnetToMd
             {
                 builder.Append("### ⭐ Methods\n");
 
-                List<MethodInformation> sortedMethods = t.Methods.Values.OrderBy(m => m.GetPrettyKey()).ToList();
+                // TODO: This will not sort methods with types from different namespaces.
+                List<MethodInformation> sortedMethods = t.Methods.Values.OrderBy(s => s.Signature).ToList();
                 foreach (MethodInformation m in sortedMethods)
                 {
                     builder.Append($"#### {m.GetPrettyKey()}\n");
@@ -212,11 +214,11 @@ namespace DotnetToMd
                 builder.Append($"{m.Summary}\n\n");
             }
 
-            if (m.Parameters?.Count > 0)
+            if (m.Parameters?.Length > 0)
             {
                 builder.Append("**Parameters** \\\n");
 
-                foreach (ArgumentInformation argument in m.Parameters.Values)
+                foreach (ArgumentInformation argument in m.Parameters)
                 {
                     builder.Append(ArgumentToMarkdown(argument));
                 }
