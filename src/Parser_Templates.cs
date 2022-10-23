@@ -147,7 +147,7 @@ namespace DotnetToMd
             {
                 builder.Append("### ⭐ Properties\n");
 
-                List<PropertyInformation> sortedProperties = t.Properties.Values.ToList();
+                List<PropertyInformation> sortedProperties = t.Properties.Values.OrderBy(p => p.Name).ToList();
                 sortedProperties.Sort();
 
                 foreach (PropertyInformation p in sortedProperties)
@@ -160,7 +160,7 @@ namespace DotnetToMd
             {
                 builder.Append("### ⭐ Events\n");
 
-                List<PropertyInformation> sortedEvents = t.Events.Values.ToList();
+                List<PropertyInformation> sortedEvents = t.Events.Values.OrderBy(e => e.Name).ToList();
                 sortedEvents.Sort();
 
                 foreach (PropertyInformation p in sortedEvents)
@@ -173,7 +173,7 @@ namespace DotnetToMd
             {
                 builder.Append("### ⭐ Methods\n");
 
-                List<MethodInformation> sortedMethods = t.Methods.Values.ToList();
+                List<MethodInformation> sortedMethods = t.Methods.Values.OrderBy(m => m.Name).ToList();
                 sortedMethods.Sort();
 
                 foreach (MethodInformation m in sortedMethods)
