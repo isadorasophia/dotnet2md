@@ -12,9 +12,17 @@ The parser itself is an executable which accepts the following arguments:
 $ Parser.exe <xml_path> <out_path> <targets>
 ```
 
-- `<xml_path>` Source directory. This is the path with the target .xml and all assemblies which will be scanned for metadata information. Full or relative to the executable path.
-- `<out_path>` Output path. Full or relative to the executable path.
-- `<targets>` Target assembly names. This accepts a list of different targets.
+- `<xml_path>`
+  - Source directory, full or relative to the script. This is the path to the target .xml and all assemblies which will be scanned for metadata information. If your project depends on multiple assemblies, all of them should be reachable within this path (typically, you can use this as your publishing path).
+- `<out_path>` 
+  - Output path, full or relative to the script. It will create directories according to the namespace hierarchy.
+- `<targets>` 
+  - Target assembly names. This accepts a list of different assemblies, all separated by spaces. These are the assemblies which will be inspected all the public types and translated into markdown.
+  
+#### Example
+```shell
+$ Parser.exe ../Release/net7.0/publish ../docs assembly1 assembly2
+```
 
 ## Installing
 ### Building from source
@@ -44,3 +52,18 @@ mkdir bin
 curl -sSL https://github.com/isadorasophia/dotnet2md/releases/download/v0.1/dotnet2md-v0.1-linux-x64.tar.gz | tar -xz --directory=bin
 bin/mdbook build
 ```
+
+## 📖 mdBook Integration
+Did we mention there is mdBook integration? Because we do! 
+
+Suppose your project name is `Assembly1`, you can create a `pre_SUMMARY.md` file at the output directory with the following format:
+
+```markdown
+# Summary
+- [Hello](hello.md)
+
+# Assembly1
+<Assembly1-Content>
+```
+
+The tool will replace the contents of `<Assembly1-Content>` with the hierarchy of the generated markdown files.
