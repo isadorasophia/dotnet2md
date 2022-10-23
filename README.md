@@ -1,5 +1,6 @@
 # 🪄 dotnet2md
 
+![Build Status](https://github.com/isadorasophia/dotnet2md/actions/workflows/ci.yaml/badge.svg)
 [![LICENSE](https://img.shields.io/github/license/isadorasophia/dotnet2md.svg)](LICENSE)
 
 dotnet2md is a tool that converts .NET metadata and XML documentation to Markdown files.
