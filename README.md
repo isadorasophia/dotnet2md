@@ -15,9 +15,9 @@ $ Parser.exe <xml_path> <out_path> <targets>
 - `<xml_path>`
   - Source directory, full or relative to the script. This is the path to the target .xml and all assemblies which will be scanned for metadata information. If your project depends on multiple assemblies, all of them should be reachable within this path (typically, you can use this as your publishing path).
 - `<out_path>` 
-  - Output path, full or relative to the script. It will create directories according to the namespace hierarchy.
+  - Output path, full or relative to the script. It will create a markdown file for each type and directories according to their namespace hierarchy.
 - `<targets>` 
-  - Target assembly names. This accepts a list of different assemblies, all separated by spaces. These are the assemblies which will be inspected all the public types and translated into markdown.
+  - Target assembly names. This accepts a list of different assemblies, all separated by spaces. These are the assemblies which the tool will inspect and translate all the public type and members into markdown.
   
 #### Example
 ```shell
@@ -56,7 +56,7 @@ bin/mdbook build
 ## 📖 mdBook Integration
 Did we mention there is mdBook integration? Because we do! 
 
-Suppose your project name is `Assembly1`, you can create a `pre_SUMMARY.md` file at the output directory with the following format:
+Suppose your project name is `Assembly1`, you can create a `pre_SUMMARY.md` file at the root of the output directory with the following format:
 
 ```markdown
 # Summary
