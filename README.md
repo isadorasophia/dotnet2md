@@ -17,7 +17,7 @@ $ Parser.exe <xml_path> <out_path> <targets>
 - `<out_path>` 
   - Output path, full or relative to the script. It will create a markdown file for each type and directories according to their namespace hierarchy.
 - `<targets>` 
-  - Target assembly names. This accepts a list of different assemblies, all separated by spaces. These are the assemblies which the tool will inspect and translate all the public type and members into markdown.
+  - Target assembly names. This accepts a list of different assemblies, all separated by spaces. These are the assemblies which the tool will inspect and translate all the public types and members into markdown.
   
 #### Example
 ```shell
