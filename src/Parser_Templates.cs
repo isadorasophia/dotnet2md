@@ -1,5 +1,6 @@
 ﻿using DotnetToMd.Metadata;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 
 namespace DotnetToMd
@@ -98,24 +99,6 @@ namespace DotnetToMd
             return @namespace.Replace('.', Path.DirectorySeparatorChar);
         }
 
-        private string RetrieveRelativePathFromNamespace(string? @namespace)
-        {
-            if (@namespace is null)
-            {
-                return string.Empty;
-            }
-
-            int level = @namespace.Count(c => c == '.');
-
-            StringBuilder builder = new();
-            while (level-- >= 0)
-            {
-                builder.Append("../");
-            }
-
-            return builder.ToString();
-        }
-
         private string GenerateMarkdownForType(TypeMetadataInformation t)
         {
             StringBuilder builder = new();
@@ -132,7 +115,7 @@ namespace DotnetToMd
                 builder.Append($"{t.Summary}\n\n");
             }
 
-            string prefix = RetrieveRelativePathFromNamespace(t.Assembly);
+            string prefix = RetrieveRelativePathFromNamespace(t.Namespace);
 
             ImmutableArray<TypeInformation> inheritedTypes = t.GetInheritedMembers();
             if (inheritedTypes.Length > 0)
@@ -287,6 +270,24 @@ namespace DotnetToMd
             return builder;
         }
 
+        private string RetrieveRelativePathFromNamespace(string? @namespace)
+        {
+            if (@namespace is null)
+            {
+                return string.Empty;
+            }
+
+            int level = @namespace.Count(c => c == '.');
+
+            StringBuilder builder = new();
+            while (level-- >= 0)
+            {
+                builder.Append("../");
+            }
+
+            return builder.ToString();
+        }
+
         /// <summary>
         /// Format the current reference link to an actual reasonable relative path.
         /// </summary>
@@ -302,7 +303,7 @@ namespace DotnetToMd
                 return link;
             }
 
-            return $"{prefix}/{link}";
+            return $"{prefix}{link}";
         }
     }
 }
