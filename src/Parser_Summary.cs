@@ -136,7 +136,7 @@ namespace DotnetToMd
             }
 
             // TODO: Figure out conflicting links.
-            return $"{prefix}{referenceLink}#{member}".ToLowerInvariant();
+            return $"{prefix}{referenceLink}#{member}";
         }
 
         private string GetMethodReferenceLink(TypeInformation type, string method, string prefix)
@@ -162,7 +162,7 @@ namespace DotnetToMd
 
             // For now, the header will be method name and the first parameter.
             // TODO: Figure out conflicting links.
-            return $"{prefix}{referenceLink}#{method}".ToLowerInvariant();
+            return $"{prefix}{referenceLink}#{method}";
         }
     }
 }
