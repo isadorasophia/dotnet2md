@@ -15,7 +15,8 @@ namespace DotnetToMd
         /// This expects two arguments:
         ///  1. Path to the output folder, relative to the executable or absolute.
         ///  2. Target assembly name.
-        ///  2. Output path of the markdown files.</param>
+        ///  3. Output path of the markdown files.
+        /// </param>
         /// <exception cref="ArgumentException">Whenever the arguments mismatch the expectation of <paramref name="args"/>.</exception>
         internal static void Main(string[] args)
         {

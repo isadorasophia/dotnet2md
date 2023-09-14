@@ -27,7 +27,7 @@ namespace DotnetToMd.Metadata
         public string? Summary;
 
         public override string ReferenceLink => Namespace is not null ?
-            $"/{Namespace.Replace('.', '/')}/{EscapedFilename}.html" : string.Empty;
+            $"{Namespace.Replace('.', '/')}/{EscapedFilename}.html" : string.Empty;
 
         internal TypeMetadataInformation(
             Type metadata,

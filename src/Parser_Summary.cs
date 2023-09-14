@@ -9,7 +9,7 @@ namespace DotnetToMd
         /// <summary>
         /// This will format a summary with cref parameters with their markdown syntax.
         /// </summary>
-        private string? FormatSummary(string? text)
+        private string? FormatSummary(string? text, string prefix)
         {
             if (string.IsNullOrEmpty(text))
             {
@@ -35,7 +35,7 @@ namespace DotnetToMd
                 string replaceString = match.Value;
                 string memberName = match.Groups[2].Value;
 
-                text = text.Replace(replaceString, ToReferenceLink(memberName));
+                text = text.Replace(replaceString, ToReferenceLink(memberName, prefix));
             }
 
             return text;
@@ -53,7 +53,9 @@ namespace DotnetToMd
             return m.Groups[2].Value.Trim();
         }
 
-        private string ToReferenceLink(string fullName)
+        /// <param name="fullName">Full name of the target type.</param>
+        /// <param name="prefix">Prefix of the current namespace (for appending to a relative path).</param>
+        private string ToReferenceLink(string fullName, string prefix)
         {
             string name = fullName.Substring(fullName.LastIndexOf(':') + 1);
             char firstCharacter = fullName[0];
@@ -72,7 +74,7 @@ namespace DotnetToMd
                     }
 
                     name = type.Name;
-                    referenceLink = type.ReferenceLink;
+                    referenceLink = FormatReferenceLink(prefix, type.ReferenceLink);
                     break;
 
                 case 'P':
@@ -88,7 +90,7 @@ namespace DotnetToMd
                     string propertyName = GetMemberName(declaringTypeName, name);
 
                     name = $"{type.Name}.{propertyName}";
-                    referenceLink = GetPropertyReferenceLink(type, propertyName);
+                    referenceLink = GetPropertyReferenceLink(type, propertyName, prefix);
                     break;
 
                 case 'M':
@@ -103,7 +105,7 @@ namespace DotnetToMd
                     string methodName = GetMemberName(declaringTypeName, name);
 
                     name = $"{type.Name}.{methodName}";
-                    referenceLink = GetMethodReferenceLink(type, methodName);
+                    referenceLink = GetMethodReferenceLink(type, methodName, prefix);
                     break;
 
                 case '!':
@@ -123,7 +125,7 @@ namespace DotnetToMd
             return $"[{name}]({referenceLink})";
         }
 
-        private string GetPropertyReferenceLink(TypeInformation type, string member)
+        private string GetPropertyReferenceLink(TypeInformation type, string member, string prefix)
         {
             string referenceLink = type.ReferenceLink;
 
@@ -134,10 +136,10 @@ namespace DotnetToMd
             }
 
             // TODO: Figure out conflicting links.
-            return $"{referenceLink}#{member}".ToLowerInvariant();
+            return $"{prefix}{referenceLink}#{member}".ToLowerInvariant();
         }
 
-        private string GetMethodReferenceLink(TypeInformation type, string method)
+        private string GetMethodReferenceLink(TypeInformation type, string method, string prefix)
         {
             string referenceLink = type.ReferenceLink;
 
@@ -160,7 +162,7 @@ namespace DotnetToMd
 
             // For now, the header will be method name and the first parameter.
             // TODO: Figure out conflicting links.
-            return $"{referenceLink}#{method}".ToLowerInvariant();
+            return $"{prefix}{referenceLink}#{method}".ToLowerInvariant();
         }
     }
 }

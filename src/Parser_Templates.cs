@@ -98,6 +98,24 @@ namespace DotnetToMd
             return @namespace.Replace('.', Path.DirectorySeparatorChar);
         }
 
+        private string RetrieveRelativePathFromNamespace(string? @namespace)
+        {
+            if (@namespace is null)
+            {
+                return string.Empty;
+            }
+
+            int level = @namespace.Count(c => c == '.');
+
+            StringBuilder builder = new();
+            while (level-- >= 0)
+            {
+                builder.Append("../");
+            }
+
+            return builder.ToString();
+        }
+
         private string GenerateMarkdownForType(TypeMetadataInformation t)
         {
             StringBuilder builder = new();
@@ -114,6 +132,8 @@ namespace DotnetToMd
                 builder.Append($"{t.Summary}\n\n");
             }
 
+            string prefix = RetrieveRelativePathFromNamespace(t.Assembly);
+
             ImmutableArray<TypeInformation> inheritedTypes = t.GetInheritedMembers();
             if (inheritedTypes.Length > 0)
             {
@@ -122,7 +142,7 @@ namespace DotnetToMd
                 for (int i = 0; i < inheritedTypes.Length; ++i)
                 {
                     TypeInformation tt = inheritedTypes[i];
-                    builder.Append($"[{tt.EscapedNameForHeader}]({tt.ReferenceLink})");
+                    builder.Append($"[{tt.EscapedNameForHeader}]({FormatReferenceLink(prefix, tt.ReferenceLink)})");
 
                     if (i != inheritedTypes.Length - 1)
                     {
@@ -140,7 +160,7 @@ namespace DotnetToMd
                 List<MethodInformation> sortedConstructors = t.Constructors.Values.OrderBy(s => s.FullSignature).ToList();
                 foreach (MethodInformation c in sortedConstructors)
                 {
-                    builder.Append(MethodToMarkdown(c));
+                    builder.Append(MethodToMarkdown(c, prefix));
                 }
             }
 
@@ -151,7 +171,7 @@ namespace DotnetToMd
                 List<PropertyInformation> sortedProperties = t.Properties.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToList();
                 foreach (PropertyInformation p in sortedProperties)
                 {
-                    builder.Append(PropertyToMarkdown(p));
+                    builder.Append(PropertyToMarkdown(p, prefix));
                 }
             }
 
@@ -162,7 +182,7 @@ namespace DotnetToMd
                 List<PropertyInformation> sortedEvents = t.Events.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToList();
                 foreach (PropertyInformation p in sortedEvents)
                 {
-                    builder.Append(PropertyToMarkdown(p));
+                    builder.Append(PropertyToMarkdown(p, prefix));
                 }
             }
 
@@ -175,7 +195,7 @@ namespace DotnetToMd
                 foreach (MethodInformation m in sortedMethods)
                 {
                     builder.Append($"#### {m.GetPrettyKey()}\n");
-                    builder.Append(MethodToMarkdown(m));
+                    builder.Append(MethodToMarkdown(m, prefix));
                 }
             }
 
@@ -184,7 +204,7 @@ namespace DotnetToMd
             return builder.ToString();
         }
 
-        private StringBuilder PropertyToMarkdown(PropertyInformation p)
+        private StringBuilder PropertyToMarkdown(PropertyInformation p, string prefix)
         {
             StringBuilder builder = new();
 
@@ -198,12 +218,12 @@ namespace DotnetToMd
             }
 
             builder.Append("**Returns** \\\n");
-            builder.Append(ArgumentToMarkdown(p.Return));
+            builder.Append(ArgumentToMarkdown(p.Return, prefix));
 
             return builder;
         }
 
-        private StringBuilder MethodToMarkdown(MethodInformation m)
+        private StringBuilder MethodToMarkdown(MethodInformation m, string prefix)
         {
             StringBuilder builder = new();
 
@@ -220,7 +240,7 @@ namespace DotnetToMd
 
                 foreach (ArgumentInformation argument in m.Parameters)
                 {
-                    builder.Append(ArgumentToMarkdown(argument));
+                    builder.Append(ArgumentToMarkdown(argument, prefix));
                 }
 
                 builder.Append("\n");
@@ -229,7 +249,7 @@ namespace DotnetToMd
             if (m.Return is ArgumentInformation @return)
             {
                 builder.Append("**Returns** \\\n");
-                builder.Append(ArgumentToMarkdown(@return));
+                builder.Append(ArgumentToMarkdown(@return, prefix));
 
                 builder.Append("\n");
             }
@@ -240,7 +260,7 @@ namespace DotnetToMd
 
                 foreach ((TypeInformation tException, string summary) in m.Exceptions)
                 {
-                    builder.Append($"[{tException.EscapedNameForHeader}]({tException.ReferenceLink}) \\\n");
+                    builder.Append($"[{tException.EscapedNameForHeader}]({FormatReferenceLink(prefix, tException.ReferenceLink)}) \\\n");
                     builder.Append($"{summary}\\\n");
                 }
             }
@@ -248,7 +268,7 @@ namespace DotnetToMd
             return builder;
         }
 
-        private StringBuilder ArgumentToMarkdown(ArgumentInformation arg)
+        private StringBuilder ArgumentToMarkdown(ArgumentInformation arg, string prefix)
         {
             StringBuilder builder = new();
 
@@ -257,7 +277,7 @@ namespace DotnetToMd
                 builder.Append($"`{arg.Name}` ");
             }
 
-            builder.Append($"[{arg.Type.EscapedNameForHeader}]({arg.Type.ReferenceLink}) \\\n");
+            builder.Append($"[{arg.Type.EscapedNameForHeader}]({FormatReferenceLink(prefix, arg.Type.ReferenceLink)}) \\\n");
 
             if (arg.Summary is not null)
             {
@@ -265,6 +285,24 @@ namespace DotnetToMd
             }
 
             return builder;
+        }
+
+        /// <summary>
+        /// Format the current reference link to an actual reasonable relative path.
+        /// </summary>
+        private string FormatReferenceLink(string prefix, string link)
+        {
+            if (link.Contains("https"))
+            {
+                return link;
+            }
+
+            if (prefix.Length == 0)
+            {
+                return link;
+            }
+
+            return $"{prefix}/{link}";
         }
     }
 }

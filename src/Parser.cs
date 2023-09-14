@@ -72,7 +72,7 @@ namespace DotnetToMd
         private void ProcessMember(XElement element)
         {
             string? memberName = element.Attribute("name")?.Value;
-            string? summary = FormatSummary(element.Element("summary")?.ToString());
+            string? summary = element.Element("summary")?.ToString();
 
             if (string.IsNullOrEmpty(memberName))
             {
@@ -117,7 +117,7 @@ namespace DotnetToMd
 
             if (typeInfo is TypeMetadataInformation metadataInfo)
             {
-                metadataInfo.Summary = summary;
+                metadataInfo.Summary = FormatSummary(summary, RetrieveRelativePathFromNamespace(metadataInfo.Namespace));
             }
         }
 
@@ -134,7 +134,7 @@ namespace DotnetToMd
             string propertyName = GetMemberName(declaringType, name);
             if (metadataInfo.Properties?.TryGetValue(propertyName, out PropertyInformation? propertyInfo) ?? false)
             {
-                propertyInfo.Summary = summary;
+                propertyInfo.Summary = FormatSummary(summary, RetrieveRelativePathFromNamespace(propertyInfo.DeclaringType.Namespace));
             }
         }
 
@@ -152,7 +152,9 @@ namespace DotnetToMd
             if ((metadataInfo.Methods?.TryGetValue(methodName, out MethodInformation? methodInfo) ?? false) ||
                 (metadataInfo.Constructors?.TryGetValue(methodName, out methodInfo) ?? false))
             {
-                methodInfo.Summary = summary;
+                string relativePathFromNamespace = RetrieveRelativePathFromNamespace(methodInfo.DeclaringType.Namespace);
+
+                methodInfo.Summary = FormatSummary(summary, relativePathFromNamespace);
 
                 List<XElement>? parameters = element.Elements("param")?.ToList();
                 if (methodInfo.Parameters is not null && parameters?.Count > 0)
@@ -160,12 +162,12 @@ namespace DotnetToMd
                     foreach (XElement parameter in parameters)
                     {
                         string? parameterName = parameter.Attribute("name")?.Value.Trim();
-                        string parameterSummary = parameter.Value.Trim();
+                        string parameterSummary = FormatSummary(parameter.Value.Trim(), relativePathFromNamespace) ?? string.Empty;
 
                         if (parameterName is not null && 
                             methodInfo.Parameters.Value.FirstOrDefault(p => p.Name == parameterName) is ArgumentInformation argument)
                         {
-                            argument.Summary = FormatSummary(parameterSummary);
+                            argument.Summary = FormatSummary(parameterSummary, relativePathFromNamespace);
                         }
                     }
                 }
@@ -174,7 +176,7 @@ namespace DotnetToMd
                 if (@return is not null && methodInfo.Return is ArgumentInformation returnInfo)
                 {
                     string returnSummary = @return.Value.Trim();
-                    returnInfo.Summary = returnSummary;
+                    returnInfo.Summary = FormatSummary(returnSummary, relativePathFromNamespace);
                 }
 
                 List<XElement>? exceptions = element.Elements("exception")?.ToList();
@@ -186,7 +188,7 @@ namespace DotnetToMd
                         string? parameterRefName = e.Attribute("cref")?.Value.Trim();
                         parameterRefName = parameterRefName?.Substring(parameterRefName.LastIndexOf(':') + 1);
 
-                        string exceptionSummary = e.Value.Trim();
+                        string exceptionSummary = FormatSummary(e.Value.Trim(), relativePathFromNamespace) ?? string.Empty;
 
                         if (parameterRefName is not null && 
                             FetchOrCreate(parameterRefName) is TypeInformation typeInformation)
@@ -213,7 +215,7 @@ namespace DotnetToMd
             string eventName = GetMemberName(declaringType, name);
             if (metadataInfo.Events?.TryGetValue(eventName, out PropertyInformation? eventInfo) ?? false)
             {
-                eventInfo.Summary = summary;
+                eventInfo.Summary = FormatSummary(summary, RetrieveRelativePathFromNamespace(eventInfo.DeclaringType.Namespace));
             }
         }
 
