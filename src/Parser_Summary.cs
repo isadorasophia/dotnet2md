@@ -136,7 +136,7 @@ namespace DotnetToMd
             }
 
             // TODO: Figure out conflicting links.
-            return $"{prefix}{referenceLink}#{member}";
+            return $"{prefix}{referenceLink}#{member.ToLowerInvariant()}";
         }
 
         private string GetMethodReferenceLink(TypeInformation type, string method, string prefix)
@@ -144,10 +144,14 @@ namespace DotnetToMd
             string referenceLink = type.ReferenceLink;
 
             // TODO: Support external types.
-            if (type is not TypeMetadataInformation metadataType || 
-                !(metadataType.Methods?.TryGetValue(method, out MethodInformation? methodInfo) ?? false))
+            if (type is not TypeMetadataInformation metadataType)
             {
                 return referenceLink;
+            }
+
+            if (!(metadataType.Methods?.TryGetValue(method, out MethodInformation? methodInfo) ?? false))
+            {
+                return $"{prefix}{referenceLink}";
             }
 
             method = methodInfo.GetPrettyKey();
@@ -162,7 +166,7 @@ namespace DotnetToMd
 
             // For now, the header will be method name and the first parameter.
             // TODO: Figure out conflicting links.
-            return $"{prefix}{referenceLink}#{method}";
+            return $"{prefix}{referenceLink}#{method.ToLowerInvariant()}";
         }
     }
 }
